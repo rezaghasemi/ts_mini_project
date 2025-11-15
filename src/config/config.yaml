@@ -1,0 +1,18 @@
+data_ingestion:
+  data_set_source: "local"
+  data_set_name: "airline_passengers"
+  data_set_store_path: "data/raw_data"
+  data_set_path: ""
+  data_set_url: ""
+
+data_preprocessing:
+  store_path: "data/processed_data"
+  train_test_split_ratio: 0.8
+
+
+model_training:
+  model_name: ""
+  model_parameters:
+    epochs: 1
+    learning_rate: 0.01
+  
