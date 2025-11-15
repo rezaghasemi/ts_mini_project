@@ -2,6 +2,7 @@ from config_reader import get_config
 from get_logger import get_logger
 import pandas as pd
 from pathlib import Path
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 logger = get_logger(__name__)
 
@@ -21,6 +22,18 @@ class DataPreprocessing:
 
     def process_data(self, raw_data: pd.DataFrame) -> list[pd.DataFrame]:
         if self.config["data_ingestion"]["data_set_name"] == "airline_passengers":
+            if self.config["data_preprocessing"]["min_max_scale"]:
+                self.min_max_scaler = MinMaxScaler(feature_range=(0, 1))
+                raw_data["SUNACTIVITY"] = self.min_max_scaler.fit_transform(
+                    raw_data[["SUNACTIVITY"]]
+                )
+                logger.info("Min Max Scaling Applied on Data into range 0 to 1")
+            if self.config["data_preprocessing"]["standard_scale"]:
+                self.standard_scaler = StandardScaler()
+                raw_data["SUNACTIVITY"] = self.standard_scaler.fit_transform(
+                    raw_data[["SUNACTIVITY"]]
+                )
+                logger.info("Standard Scaling Applied on Data")
             return raw_data
         else:
             logger.error("Data set not supported")
