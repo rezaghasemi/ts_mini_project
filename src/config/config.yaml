@@ -13,8 +13,13 @@ data_preprocessing:
 
 
 model_training:
-  model_name: ""
-  model_parameters:
-    epochs: 1
-    learning_rate: 0.01
-  
+  model_name: "TFT"
+  model_save_path: "saved_models"
+
+TFT_model:
+  history_length: 5
+  prediction_length: 1
+  epochs: 1
+  batch_size: 32
+  learning_rate: 0.001
+  device: "auto"

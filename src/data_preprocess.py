@@ -1,5 +1,5 @@
-from config_reader import get_config
-from get_logger import get_logger
+from utils.config_reader import get_config
+from utils.get_logger import get_logger
 import pandas as pd
 from pathlib import Path
 from sklearn.preprocessing import StandardScaler, MinMaxScaler

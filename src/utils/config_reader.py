@@ -1,6 +1,6 @@
 import yaml
 from pathlib import Path
-from get_logger import get_logger
+from utils.get_logger import get_logger
 
 logger = get_logger(__name__)
 

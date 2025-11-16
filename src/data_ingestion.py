@@ -1,5 +1,5 @@
-from get_logger import get_logger
-from config_reader import get_config
+from utils.get_logger import get_logger
+from utils.config_reader import get_config
 import pandas as pd
 from pathlib import Path
 
