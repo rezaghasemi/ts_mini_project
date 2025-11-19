@@ -7,3 +7,7 @@ src/time_series_forecasting.egg-info/PKG-INFO
 src/time_series_forecasting.egg-info/SOURCES.txt
 src/time_series_forecasting.egg-info/dependency_links.txt
 src/time_series_forecasting.egg-info/top_level.txt
+src/utils/__init__.py
+src/utils/config_reader.py
+src/utils/get_logger.py
+src/utils/get_model.py

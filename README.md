@@ -1,2 +1,68 @@
-# ts_mini_project
-Time series mini project for reviewing TS concepts
+# Time Series Forecasting Mini Project
+
+![GitHub Repo Size](https://img.shields.io/github/repo-size/rezaghasemi/ts_mini_project)
+![Python Version](https://img.shields.io/badge/python-3.11-blue)
+![License](https://img.shields.io/github/license/rezaghasemi/ts_mini_project)
+![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)
+![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000)
+![MLflow](https://img.shields.io/badge/mlflow-tracking-orange)
+
+A mini time series forecasting project using the classic **Sunspots** dataset from `statsmodels.datasets`. The goal is to implement and compare different forecasting models:  
+
+- Temporal Fusion Transformer (TFT) ✅
+- ARIMA
+- DeepAR
+
+---
+
+## Project Overview
+
+This project focuses on forecasting sunspot activity using multiple models:
+
+1. **Temporal Fusion Transformer (TFT)** – a deep learning model for interpretable multi-horizon time series forecasting.
+2. **ARIMA** – a classical statistical model for univariate time series.
+3. **DeepAR** – a probabilistic forecasting model using autoregressive RNNs.
+
+TFT is implemented, here is the result:
+
+### Training Loss Figure (TFT)
+![TFT Training Loss](imgs/tft_train_loss.png)
+
+---
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone git@github.com:rezaghasemi/ts_mini_project.git
+cd ts_mini_project
+```
+
+Create a virtual environment and install dependencies:
+
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+## Libraries
+
+- **pytorch-forecasting**, **pytorch-lightning** – for deep learning models (TFT, DeepAR)  
+- **statsmodels** – for ARIMA and dataset loading  
+- **pandas**, **numpy**, **matplotlib** – data handling and visualization  
+- **mlflow** – experiment tracking  
+- **fastapi** / **flask** – for potential API deployment  
+
+
+## Project Status
+
+- **TFT implemented** ✅  
+- **ARIMA implementation**: Pending  
+- **DeepAR implementation**: Pending
+
+
+## License
+
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).

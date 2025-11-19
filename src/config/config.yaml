@@ -19,7 +19,7 @@ model_training:
 TFT_model:
   history_length: 5
   prediction_length: 1
-  epochs: 1
+  epochs: 10
   batch_size: 32
   learning_rate: 0.001
   device: "auto"

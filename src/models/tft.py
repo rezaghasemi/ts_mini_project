@@ -1,5 +1,5 @@
 from interfaces.base_models import forcastingBaseModel
-from src.utils.config_reader import get_config
+from utils.config_reader import get_config
 from pathlib import Path
 from utils.get_logger import get_logger
 from pytorch_forecasting.models.temporal_fusion_transformer import (
@@ -9,6 +9,8 @@ from pytorch_forecasting import TimeSeriesDataSet
 from pytorch_forecasting.metrics import QuantileLoss
 import pandas as pd
 import lightning.pytorch as pl
+from lightning.pytorch.loggers import MLFlowLogger
+import mlflow
 
 logger = get_logger(__name__)
 
@@ -85,6 +87,10 @@ class TFTModel(forcastingBaseModel):
     def train(self):
         epochs = self.config["TFT_model"]["epochs"]
         save_path = Path(self.config["model_training"]["model_save_path"]) / "tft"
+        mlflow_logger = MLFlowLogger(
+            experiment_name="my_experiment",
+            tracking_uri="file:./mlruns",  # local folder; can also be a remote server
+        )
         checkpoint_callback = pl.callbacks.ModelCheckpoint(
             dirpath=save_path,
             filename="best-tft-{epoch:02d}-{val_loss:.4f}",
@@ -99,6 +105,7 @@ class TFTModel(forcastingBaseModel):
             callbacks=[checkpoint_callback],
             accelerator=self.device,
             devices=1,
+            logger=mlflow_logger,
         )
         trainer.fit(
             self.model,
