@@ -1,11 +1,13 @@
 # Time Series Forecasting Mini Project
 
 ![GitHub Repo Size](https://img.shields.io/github/repo-size/rezaghasemi/ts_mini_project)
-![Python Version](https://img.shields.io/badge/python-3.11-blue)
+![Python Version](https://img.shields.io/badge/python-3.10.19-blue)
 ![License](https://img.shields.io/github/license/rezaghasemi/ts_mini_project)
-![Pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)
-![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000)
 ![MLflow](https://img.shields.io/badge/mlflow-tracking-orange)
+![PyTorch](https://img.shields.io/badge/pytorch-2.1.0-red)
+![Jupyter](https://img.shields.io/badge/jupyter-notebook-orange)
+![Forecasting](https://img.shields.io/badge/forecasting-pytorch--forecasting-green)
+
 
 A mini time series forecasting project using the classic **Sunspots** dataset from `statsmodels.datasets`. The goal is to implement and compare different forecasting models:  
 
