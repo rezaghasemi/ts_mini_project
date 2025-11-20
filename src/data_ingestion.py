@@ -11,11 +11,10 @@ class DataIngestion:
         self.config = get_config(config)
 
     def get_data(self):
-        if self.config["data_ingestion"]["data_set_source"] == "local":
+        if self.config["data_ingestion"]["data_set_source"] == "online":
             if self.config["data_ingestion"]["data_set_name"] == "airline_passengers":
-                from statsmodels.datasets import sunspots
-
-                raw_data = sunspots.load_pandas().data
+                url = self.config["data_ingestion"]["data_set_url"]
+                raw_data = pd.read_csv(url)
                 return raw_data
         else:
             raise Exception("Data source not supported")
@@ -23,7 +22,10 @@ class DataIngestion:
     def store_data(self, raw_data: pd.DataFrame):
         raw_data_path = Path(self.config["data_ingestion"]["data_set_store_path"])
         raw_data_path.mkdir(parents=True, exist_ok=True)
-        raw_data.to_csv(raw_data_path / "raw_data.csv", index=False)
+        raw_data.to_csv(
+            raw_data_path / f"{self.config['data_ingestion']['data_set_name']}.csv",
+            index=False,
+        )
 
     def run(self):
         logger.info("Ingesting data")
