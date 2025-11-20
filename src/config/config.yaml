@@ -1,9 +1,9 @@
 data_ingestion:
-  data_set_source: "local"
+  data_set_source: "online"
   data_set_name: "airline_passengers"
   data_set_store_path: "data/raw_data"
   data_set_path: ""
-  data_set_url: ""
+  data_set_url: "'https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv'"
 
 data_preprocessing:
   store_path: "data/processed_data"
@@ -23,3 +23,10 @@ TFT_model:
   batch_size: 32
   learning_rate: 0.001
   device: "auto"
+
+ARIMA_model:
+  data_name: sunspots
+  p: 5
+  d: 1
+  q: 2
+

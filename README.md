@@ -28,7 +28,7 @@ This project focuses on forecasting sunspot activity using multiple models:
 TFT is implemented, here is the result:
 
 ### Training Loss Figure (TFT)
-<img src="imgs/tft_train_loss.png" alt="TFT Training Loss" width="30"/>
+<img src="imgs/tft_train_loss.png" alt="TFT Training Loss" width="450"/>
 
 ---
 
