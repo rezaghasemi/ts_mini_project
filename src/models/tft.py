@@ -5,6 +5,7 @@ from utils.get_logger import get_logger
 from pytorch_forecasting.models.temporal_fusion_transformer import (
     TemporalFusionTransformer,
 )
+import matplotlib.pyplot as plt
 from pytorch_forecasting import TimeSeriesDataSet
 from pytorch_forecasting.metrics import QuantileLoss
 import pandas as pd
@@ -46,45 +47,53 @@ class TFTModel(forcastingBaseModel):
         )
 
     def load_data(self):
-        path_to_data = Path(self.config["data_preprocessing"]["store_path"])
-        train_data = pd.read_csv(path_to_data / "train_data.csv")
-        test_data = pd.read_csv(path_to_data / "test_data.csv")
+        path_to_data = (
+            Path(self.config["data_preprocessing"]["store_path"])
+            / self.config["data_ingestion"]["data_set_name"]
+        )
+
+        self.train_raw_data = pd.read_csv(path_to_data / "train_data.csv")
+        self.test_raw_data = pd.read_csv(path_to_data / "test_data.csv")
 
         history_length = self.config["TFT_model"]["history_length"]
         prediction_length = self.config["TFT_model"]["prediction_length"]
 
-        train_data["group_id"] = 0
-        train_data["time_idx"] = range(len(train_data))
-        test_data["group_id"] = 0
-        test_data["time_idx"] = range(len(test_data))
+        self.train_raw_data["group_id"] = 0
+        self.train_raw_data["time_idx"] = range(len(self.train_data))
+        self.test_raw_data["group_id"] = 0
+        self.test_raw_data["time_idx"] = range(len(self.test_data))
 
-        train_data = TimeSeriesDataSet(
-            train_data,
-            group_ids=["group_id"],
-            target="SUNACTIVITY",
-            time_idx="time_idx",
-            min_encoder_length=history_length,
-            max_encoder_length=history_length,
-            max_prediction_length=1,
-            time_varying_known_reals=["YEAR"],
-            time_varying_unknown_reals=["SUNACTIVITY"],
-        )
+        self.all_data = pd.concat([self.train_raw_data, self.test_raw_data])[
+            ["Date", "Year", "Month", "Passengers"]
+        ]
 
-        test_data = TimeSeriesDataSet(
-            test_data,
+        train_DataSet = TimeSeriesDataSet(
+            self.train_raw_data,
             group_ids=["group_id"],
-            target="SUNACTIVITY",
+            target="Passengers",
             time_idx="time_idx",
             min_encoder_length=history_length,
             max_encoder_length=history_length,
             max_prediction_length=prediction_length,
-            time_varying_known_reals=["YEAR"],
-            time_varying_unknown_reals=["SUNACTIVITY"],
+            time_varying_known_reals=["Month", "Year"],
+            time_varying_unknown_reals=["Passengers"],
         )
 
-        return train_data, test_data
+        test_DataSet = TimeSeriesDataSet(
+            self.test_raw_data,
+            group_ids=["group_id"],
+            target="Passengers",
+            time_idx="time_idx",
+            min_encoder_length=history_length,
+            max_encoder_length=history_length,
+            max_prediction_length=prediction_length,
+            time_varying_known_reals=["Month", "Year"],
+            time_varying_unknown_reals=["Passengers"],
+        )
 
-    def train(self):
+        return train_DataSet, test_DataSet
+
+    def run(self):
         epochs = self.config["TFT_model"]["epochs"]
         save_path = Path(self.config["model_training"]["model_save_path"]) / "tft"
         mlflow_logger = MLFlowLogger(
@@ -98,7 +107,6 @@ class TFTModel(forcastingBaseModel):
             mode="min",
             save_top_k=1,
         )
-
         trainer = pl.Trainer(
             max_epochs=epochs,  # number of passes through the data
             gradient_clip_val=0.1,  # stabilizes training
@@ -112,20 +120,19 @@ class TFTModel(forcastingBaseModel):
             self.train_data_dataloader,
             self.test_data_dataloader,
         )
+        self.save_model()
+        self.plot_prediction_and_forecast()
+
+    def plot_prediction_and_forecast(self):
+        pass
+
+    def ar_forecast(sel, input_data: pd.DataFrame, steps: int) -> pd.DataFrame:
+        pass
 
     def save_model(self):
-        pass
-
-    def predict(self):
-        pass
-
-    def evaluate(self):
-        pass
-
-    def load_model(self):
         pass
 
 
 if __name__ == "__main__":
     model = TFTModel("src/config/config.yaml")
-    model.train()
+    model.run()

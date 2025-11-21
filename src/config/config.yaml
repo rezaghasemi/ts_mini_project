@@ -10,8 +10,8 @@ data_preprocessing:
   min_max_scale: False
   standard_scale: False
   train_ratio: 0.7
-  test_ratio: 0.2
-  val_ratio: 0.1
+  test_ratio: 0.3
+  
 
 
 model_training:
@@ -32,3 +32,5 @@ ARIMA_model:
   d: 1
   q: 2
 
+results:
+  plots_path: "results/plots"

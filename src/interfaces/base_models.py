@@ -7,25 +7,17 @@ class forcastingBaseModel(ABC):
         pass
 
     @abstractmethod
-    def train(self):
+    def run(self):
         pass
 
     @abstractmethod
-    def predict(self):
-        pass
-
-    @abstractmethod
-    def evaluate(self):
-        pass
-
-    @abstractmethod
-    def save_model(self):
-        pass
-
-    @abstractmethod
-    def load_model(self):
+    def plot_prediction_and_forecast(self):
         pass
 
     @abstractmethod
     def load_data(self):
+        pass
+
+    @abstractmethod
+    def save_model(self):
         pass

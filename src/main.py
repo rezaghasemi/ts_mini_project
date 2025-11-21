@@ -9,5 +9,5 @@ if __name__ == "__main__":
     data_preprocess = DataPreprocessing("src/config/config.yaml")
     data_preprocess.run()
 
-    model = get_model("src/config/config.yaml")
-    model.train()
+    # model = get_model("src/config/config.yaml")
+    # model.train()
