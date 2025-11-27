@@ -1,4 +1,5 @@
 from interfaces.base_models import forcastingBaseModel
+from pytorch_forecasting.data.timeseries import GroupNormalizer
 from utils.config_reader import get_config
 from pathlib import Path
 from utils.get_logger import get_logger
@@ -12,6 +13,7 @@ import pandas as pd
 import lightning.pytorch as pl
 from lightning.pytorch.loggers import MLFlowLogger
 import mlflow
+import torch
 
 logger = get_logger(__name__)
 
@@ -21,11 +23,11 @@ class TFTModel(forcastingBaseModel):
         super().__init__()
         self.config = get_config(config)
         self.device = self.config["TFT_model"]["device"]
-
-        train_data, test_data = self.load_data()
+        self.batch_size = self.config["TFT_model"]["batch_size"]
+        self.train_data_loader, self.val_data_loader = self.load_data()
 
         self.model = TemporalFusionTransformer.from_dataset(
-            train_data,
+            self.train_data_loader.dataset,
             learning_rate=self.config["TFT_model"]["learning_rate"],
             hidden_size=32,
             dropout=0.1,
@@ -33,65 +35,63 @@ class TFTModel(forcastingBaseModel):
             loss=QuantileLoss(),
             reduce_on_plateau_patience=4,
         )
-        self.train_data_dataloader = train_data.to_dataloader(
-            train=True,
-            batch_size=self.config["TFT_model"]["batch_size"],
-            shuffle=True,
-            num_workers=0,
-        )
-        self.test_data_dataloader = test_data.to_dataloader(
-            train=False,
-            batch_size=self.config["TFT_model"]["batch_size"],
-            shuffle=False,
-            num_workers=0,
-        )
 
     def load_data(self):
         path_to_data = (
-            Path(self.config["data_preprocessing"]["store_path"])
-            / self.config["data_ingestion"]["data_set_name"]
+            Path(self.config["data_ingestion"]["data_set_store_path"])
+            / f"{self.config['data_ingestion']['data_set_name']}.csv"
         )
+        if not path_to_data.exists():
+            logger.error(f"Data file not found at {path_to_data}")
+            raise FileNotFoundError(f"Data file not found at {path_to_data}")
+        data = pd.read_csv(path_to_data)
+        data = data.assign(
+            dt_month=pd.to_datetime(data["Month"], format="%Y-%m").dt.month,
+            dt_year=pd.to_datetime(data["Month"], format="%Y-%m").dt.year,
+        )
+        data["time_idx"] = range(len(data))
+        data["group_id"] = "0"  # single time series
+        max_encoder_length = self.config["TFT_model"]["max_encoder_length"]
+        max_prediction_length = self.config["TFT_model"]["max_prediction_length"]
+        training_cutoff = data["time_idx"].max() - max_prediction_length
 
-        self.train_raw_data = pd.read_csv(path_to_data / "train_data.csv")
-        self.test_raw_data = pd.read_csv(path_to_data / "test_data.csv")
-
-        history_length = self.config["TFT_model"]["history_length"]
-        prediction_length = self.config["TFT_model"]["prediction_length"]
-
-        self.train_raw_data["group_id"] = 0
-        self.train_raw_data["time_idx"] = range(len(self.train_data))
-        self.test_raw_data["group_id"] = 0
-        self.test_raw_data["time_idx"] = range(len(self.test_data))
-
-        self.all_data = pd.concat([self.train_raw_data, self.test_raw_data])[
-            ["Date", "Year", "Month", "Passengers"]
-        ]
-
-        train_DataSet = TimeSeriesDataSet(
-            self.train_raw_data,
-            group_ids=["group_id"],
-            target="Passengers",
+        training = TimeSeriesDataSet(
+            data[lambda x: x.time_idx <= training_cutoff],
             time_idx="time_idx",
-            min_encoder_length=history_length,
-            max_encoder_length=history_length,
-            max_prediction_length=prediction_length,
-            time_varying_known_reals=["Month", "Year"],
-            time_varying_unknown_reals=["Passengers"],
-        )
-
-        test_DataSet = TimeSeriesDataSet(
-            self.test_raw_data,
-            group_ids=["group_id"],
             target="Passengers",
-            time_idx="time_idx",
-            min_encoder_length=history_length,
-            max_encoder_length=history_length,
-            max_prediction_length=prediction_length,
-            time_varying_known_reals=["Month", "Year"],
+            group_ids=["group_id"],  # only one time series in this dataset
+            min_encoder_length=max_encoder_length
+            // 2,  # keep encoder length long (as it is in the validation set)
+            max_encoder_length=max_encoder_length,
+            min_prediction_length=1,
+            max_prediction_length=max_prediction_length,
+            # static_categoricals=["name of static categorical variables"], we don't have any in this dataset
+            # static_reals=["name of static real variables"], # we don't have any in this dataset
+            time_varying_known_categoricals=[],
+            time_varying_known_reals=["time_idx", "dt_month", "dt_year"],
+            time_varying_unknown_categoricals=[],  # we don't have any in this dataset
             time_varying_unknown_reals=["Passengers"],
+            target_normalizer=GroupNormalizer(
+                groups=["group_id"], center=True, scale_by_group=True
+            ),
+            add_relative_time_idx=True,
+            add_target_scales=True,
+            add_encoder_length=True,
         )
 
-        return train_DataSet, test_DataSet
+        # create validation set (predict=True) which means to predict the last max_prediction_length points in time
+        validation = TimeSeriesDataSet.from_dataset(
+            training, data, predict=True, stop_randomization=True
+        )
+
+        # create dataloaders for model
+        train_dataloader = training.to_dataloader(
+            train=True, batch_size=self.batch_size, num_workers=0
+        )
+        val_dataloader = validation.to_dataloader(
+            train=False, batch_size=self.batch_size, num_workers=0
+        )
+        return train_dataloader, val_dataloader
 
     def run(self):
         epochs = self.config["TFT_model"]["epochs"]
@@ -115,19 +115,21 @@ class TFTModel(forcastingBaseModel):
             devices=1,
             logger=mlflow_logger,
         )
-        trainer.fit(
-            self.model,
-            self.train_data_dataloader,
-            self.test_data_dataloader,
-        )
+        trainer.fit(self.model, self.train_data_loader, self.val_data_loader)
         self.save_model()
         self.plot_prediction_and_forecast()
 
     def plot_prediction_and_forecast(self):
-        pass
+        raw_predictions = self.model.predict(
+            self.val_data_loader,
+            mode="raw",
+            return_x=True,
+            trainer_kwargs=dict(accelerator="cpu"),
+        )
 
-    def ar_forecast(sel, input_data: pd.DataFrame, steps: int) -> pd.DataFrame:
-        pass
+        self.model.plot_prediction(
+            raw_predictions.x, raw_predictions.output, idx=0, add_loss_to_title=True
+        )
 
     def save_model(self):
         pass

@@ -19,12 +19,13 @@ model_training:
   model_save_path: "saved_models"
 
 TFT_model:
-  history_length: 5
-  prediction_length: 1
+  max_encoder_length: 5
+  max_prediction_length: 10
+  device: "mps"
+  batch_size: 16
   epochs: 10
-  batch_size: 32
   learning_rate: 0.001
-  device: "auto"
+  
 
 ARIMA_model:
   data_name: sunspots
