@@ -3,3 +3,4 @@ data
 logs
 mlruns
 saved_models
+lightning_logs

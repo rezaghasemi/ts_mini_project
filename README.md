@@ -23,12 +23,13 @@ This project focuses on forecasting sunspot activity using multiple models:
 
 1. **Temporal Fusion Transformer (TFT)** – a deep learning model for interpretable multi-horizon time series forecasting.
 2. **ARIMA** – a classical statistical model for univariate time series.
+3. **SARIMA** - a classical statistical model for seasonal time series
 3. **DeepAR** – a probabilistic forecasting model using autoregressive RNNs.
 
 TFT is implemented, here is the result:
 
 ### Training Loss Figure (TFT)
-<img src="imgs/tft_train_loss.png" alt="TFT Training Loss" width="450"/>
+<img src="results/figures/TFT_airline_passengers.png" alt="TFT Training Loss" width="450"/>
 
 ---
 

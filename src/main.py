@@ -6,5 +6,5 @@ if __name__ == "__main__":
     data_ingestion = DataIngestion("src/config/config.yaml")
     data_ingestion.run()
 
-    # model = get_model("src/config/config.yaml")
-    # model.train()
+    model = get_model("src/config/config.yaml")
+    model.run()

@@ -1,5 +1,5 @@
 from interfaces.base_models import forcastingBaseModel
-from pytorch_forecasting.data.timeseries import GroupNormalizer
+from pytorch_forecasting import GroupNormalizer
 from utils.config_reader import get_config
 from pathlib import Path
 from utils.get_logger import get_logger
@@ -130,6 +130,14 @@ class TFTModel(forcastingBaseModel):
         self.model.plot_prediction(
             raw_predictions.x, raw_predictions.output, idx=0, add_loss_to_title=True
         )
+
+        path = (
+            Path(self.config["model_training"]["figures_save_path"])
+            / f"{self.config['model_training']['model_name']}_{self.config['data_ingestion']['data_set_name']}.png"
+        )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(path)
+        plt.close()
 
     def save_model(self):
         pass

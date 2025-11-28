@@ -17,9 +17,10 @@ data_preprocessing:
 model_training:
   model_name: "TFT"
   model_save_path: "saved_models"
+  figures_save_path: "results/figures"
 
 TFT_model:
-  max_encoder_length: 5
+  max_encoder_length: 20
   max_prediction_length: 10
   device: "mps"
   batch_size: 16
