@@ -133,7 +133,7 @@ class TFTModel(forcastingBaseModel):
 
         path = (
             Path(self.config["model_training"]["figures_save_path"])
-            / f"{self.config['model_training']['model_name']}_{self.config['data_ingestion']['data_set_name']}.png"
+            / f"TFT_{self.config['data_ingestion']['data_set_name']}.png"
         )
         path.parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(path)

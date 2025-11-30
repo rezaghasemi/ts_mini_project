@@ -17,7 +17,3 @@ class forcastingBaseModel(ABC):
     @abstractmethod
     def load_data(self):
         pass
-
-    @abstractmethod
-    def save_model(self):
-        pass

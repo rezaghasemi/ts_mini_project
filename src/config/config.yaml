@@ -13,7 +13,6 @@ data_preprocessing:
   test_ratio: 0.3
   
 
-
 model_training:
   model_name: "TFT"
   model_save_path: "saved_models"
@@ -33,6 +32,7 @@ ARIMA_model:
   p: 5
   d: 1
   q: 2
+  max_prediction_length: 10
 
 results:
   plots_path: "results/plots"

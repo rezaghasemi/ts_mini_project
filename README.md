@@ -24,13 +24,16 @@ This project focuses on forecasting sunspot activity using multiple models:
 1. **Temporal Fusion Transformer (TFT)** – a deep learning model for interpretable multi-horizon time series forecasting.
 2. **ARIMA** – a classical statistical model for univariate time series.
 3. **SARIMA** - a classical statistical model for seasonal time series
-3. **DeepAR** – a probabilistic forecasting model using autoregressive RNNs.
 
 TFT is implemented, here is the result:
 
 ### Training Loss Figure (TFT)
-<img src="results/figures/TFT_airline_passengers.png" alt="TFT Training Loss" width="450"/>
+<img src="results/figures/TFT_airline_passengers.png" alt="TFT Prediction Loss" width="450"/>
 
+ARIMA is implemented, here is the result:
+
+### Training Loss Figure (TFT)
+<img src="results/figures/ARIMA_airline_passengers.png" alt="ARIMA Prediction Loss" width="450"/>
 ---
 
 ## Installation
@@ -52,18 +55,17 @@ pip install -r requirements.txt
 
 ## Libraries
 
-- **pytorch-forecasting**, **pytorch-lightning** – for deep learning models (TFT, DeepAR)  
+- **pytorch-forecasting**, **pytorch-lightning** – for deep learning models (TFT)  
 - **statsmodels** – for ARIMA and dataset loading  
 - **pandas**, **numpy**, **matplotlib** – data handling and visualization  
 - **mlflow** – experiment tracking  
-- **fastapi** / **flask** – for potential API deployment  
 
 
 ## Project Status
 
 - **TFT implemented** ✅  
-- **ARIMA implementation**: Pending  
-- **DeepAR implementation**: Pending
+- **ARIMA implementation**: ✅  
+- **SARIMA implementation**: Pending
 
 
 ## License

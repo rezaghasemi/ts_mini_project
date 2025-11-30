@@ -13,13 +13,13 @@ import joblib
 warnings.filterwarnings("ignore")
 
 
-class ARIMA(forcastingBaseModel):
+class ARIMA_model(forcastingBaseModel):
     def __init__(self, config: str):
         super().__init__()
         self.config = get_config(config)
 
-    def train(self):
-        train_data, val_data = self.load_data()
+    def run(self):
+        self.train_data, self.val_data = self.load_data()
         mlflow.set_experiment("ARIMA_experiment")
         with mlflow.start_run():
             p, d, q = (
@@ -27,42 +27,54 @@ class ARIMA(forcastingBaseModel):
                 self.config["ARIMA_model"]["d"],
                 self.config["ARIMA_model"]["q"],
             )
-            model = ARIMA(train_data, order=(p, d, q))
-            model_fit = model.fit()
-            evaluation = self.evaluate(model_fit, val_data)
+            model = ARIMA(self.train_data, order=(p, d, q))
+            self.model_fit = model.fit()
+
             mlflow.log_params({"p": p, "d": d, "q": q})
-            mlflow.log_metrics(evaluation)
-            mlflow.log_artifact(
-                Path(self.config["model_training"]["model_save_path"])
-                / "arima_model.pkl"
-            )
 
-            self.save_model(model_fit)
+            self.plot_prediction_and_forecast()
 
-    def predict(self):
-        pass
-
-    def evaluate(self, model_fit, val_data):
-        predictions = model_fit.forecast(steps=len(val_data))
-        mse = np.mean((predictions - val_data.values.flatten()) ** 2)
-        return {"MSE": mse}
-
-    def save_model(self):
-        save_path = Path(self.config["model_training"]["model_save_path"])
-        save_path.mkdir(parents=True, exist_ok=True)
-        model_file = save_path / "arima_model.pkl"
-        joblib.dump(self.model, model_file)
+    def plot_prediction_and_forecast(self):
+        result = self.model_fit.forecast(steps=len(self.val_data))
+        plt.figure(figsize=(10, 6))
+        plt.plot(
+            range(1, len(self.val_data) + 1),
+            self.val_data,
+            color="blue",
+            label="Actual",
+        )
+        plt.plot(
+            range(1, len(self.val_data) + 1),
+            result,
+            color="red",
+            label="Forecasted",
+        )
+        plt.xlabel("Month")
+        plt.ylabel("Number of Passengers")
+        plt.title("ARIMA Model - Actual vs Forecasted")
+        plt.legend()
+        path = (
+            Path(self.config["model_training"]["figures_save_path"])
+            / f"ARIMA_{self.config['data_ingestion']['data_set_name']}.png"
+        )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(path)
+        plt.close()
 
     def load_model(self):
         pass
 
     def load_data(self):
-        PROC_DATA_PATH = Path(self.config["data_preprocessing"]["store_path"])
-        train_data_path = PROC_DATA_PATH / "train_data.csv"
-        val_data_path = PROC_DATA_PATH / "val_data.csv"
-        if not train_data_path.exists() or not val_data_path.exists():
-            raise FileNotFoundError("Preprocessed data files not found.")
-        train_data = pd.read_csv(train_data_path)
-        val_data = pd.read_csv(val_data_path)
-
+        RAW_DATA_PATH = Path(self.config["data_ingestion"]["data_set_store_path"])
+        data_set_name = self.config["data_ingestion"]["data_set_name"]
+        all_data = pd.read_csv(RAW_DATA_PATH / f"{data_set_name}.csv")
+        max_prediction_length = self.config["ARIMA_model"]["max_prediction_length"]
+        all_data = all_data["Passengers"].to_numpy()
+        train_data = all_data[:-max_prediction_length]
+        val_data = all_data[-max_prediction_length:]
         return train_data, val_data
+
+
+if __name__ == "__main__":
+    arima_model = ARIMA_model(config="src/config/config.yaml")
+    arima_model.run()
