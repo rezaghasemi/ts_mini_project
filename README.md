@@ -27,12 +27,12 @@ This project focuses on forecasting sunspot activity using multiple models:
 
 TFT is implemented, here is the result:
 
-### Training Loss Figure (TFT)
+### TFT Prediction
 <img src="results/figures/TFT_airline_passengers.png" alt="TFT Prediction Loss" width="450"/>
 
 ARIMA is implemented, here is the result:
 
-### Training Loss Figure (TFT)
+### ARIMA Prediction
 <img src="results/figures/ARIMA_airline_passengers.png" alt="ARIMA Prediction Loss" width="450"/>
 ---
 
