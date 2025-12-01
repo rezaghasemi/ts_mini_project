@@ -28,11 +28,21 @@ TFT_model:
   
 
 ARIMA_model:
-  data_name: sunspots
   p: 5
   d: 1
   q: 2
   max_prediction_length: 10
+
+SARIMA_model:
+  p: 5
+  d: 1
+  q: 2
+  seasonal_P: 1
+  seasonal_D: 1
+  seasonal_Q: 1
+  seasonal_period: 12
+  max_prediction_length: 10
+
 
 results:
   plots_path: "results/plots"

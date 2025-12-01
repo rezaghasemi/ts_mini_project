@@ -34,6 +34,19 @@ ARIMA is implemented, here is the result:
 
 ### ARIMA Prediction
 <img src="results/figures/ARIMA_airline_passengers.png" alt="ARIMA Prediction Loss" width="450"/>
+
+SARIMA is implemented, here is the result:
+
+### SARIMA Prediction
+<img src="results/figures/SARIMA_airline_passengers.png" alt="SARIMA Prediction Loss" width="450"/>
+---
+
+## 📊 Model Comparison Summary
+
+**SARIMA** outperforms **ARIMA** because it explicitly models seasonality, allowing it to capture repeating patterns in the time series that **ARIMA** ignores. This results in forecasts that follow the actual trend much more closely.
+
+**Temporal Fusion Transformer (TFT)** does not outperform **ARIMA** or **SARIMA** in this experiment. The main reason is the small dataset size—TFT is a deep learning model that requires significantly more data to learn long-term dependencies and seasonal patterns effectively.
+
 ---
 
 ## Installation
@@ -65,7 +78,7 @@ pip install -r requirements.txt
 
 - **TFT implemented** ✅  
 - **ARIMA implementation**: ✅  
-- **SARIMA implementation**: Pending
+- **SARIMA implementation**: ✅
 
 
 ## License
