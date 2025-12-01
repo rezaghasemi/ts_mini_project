@@ -9,11 +9,11 @@
 ![Forecasting](https://img.shields.io/badge/forecasting-pytorch--forecasting-green)
 
 
-A mini time series forecasting project using the classic **Sunspots** dataset from `statsmodels.datasets`. The goal is to implement and compare different forecasting models:  
+A mini time series forecasting project using the classic **Arilinw Passengers** dataset from `statsmodels.datasets`. The goal is to implement and compare different forecasting models:  
 
 - Temporal Fusion Transformer (TFT) ✅
-- ARIMA
-- DeepAR
+- ARIMA ✅
+- SARIMA ✅
 
 ---
 
